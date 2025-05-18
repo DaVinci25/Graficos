@@ -1,0 +1,7 @@
+{
+  "name": "graficos",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}
