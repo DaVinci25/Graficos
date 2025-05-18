@@ -8,7 +8,7 @@
 
     <ion-content :fullscreen="true" class="dashboard-content">
       <div class="dashboard-container">
-        <!-- KPI Cards -->
+        <!-- Primera fila: KPIs -->
         <div class="kpi-cards">
           <div class="kpi-card">
             <div class="kpi-value">{{ userConversionRate }}%</div>
@@ -37,8 +37,19 @@
           </div>
         </div>
 
-        <!-- Primera fila: Dos gráficos grandes -->
+        <!-- Segunda fila: Ingresos y Crecimiento -->
         <div class="chart-row">
+          <div class="chart-container large">
+            <ApexLineRT 
+              title="Ingresos por Suscripción (€)"
+              :min="0"
+              :max="2000"
+              :data="suscripcionesData"
+              :labels="meses"
+              color="#3b82f6"
+              :kpiTarget="2000"
+            />
+          </div>
           <div class="chart-container large">
             <BusinessChartJSLineAreaRT 
               chartType="line" 
@@ -51,41 +62,16 @@
               :kpiTarget="1500"
             />
           </div>
-          <div class="chart-container large">
-            <ApexLineRT 
-              title="Ingresos por Suscripción (€)"
-              :min="0"
-              :max="2500"
-              :data="suscripcionesData"
-              :labels="meses"
-              color="#3b82f6"
-              :kpiTarget="2000"
-            />
-          </div>
         </div>
 
-        <!-- Segunda fila: Distribución geográfica y Progreso personalizado -->
+        <!-- Tercera fila: Distribución y Tiempo de uso -->
         <div class="chart-row">
-          <div class="chart-container half-width">
+          <div class="chart-container large">
             <EchartsPie 
               title="Distribución de Usuarios por País"
               :data="paisesData"
             />
           </div>
-          <div class="chart-container half-width">
-            <CustomProgressChart
-              title="Objetivos de Negocio (Q2 2023)"
-              :data="progressData"
-              :maxValue="100"
-              unit="%"
-              baseColor="#10b981"
-              :showTarget="true"
-            />
-          </div>
-        </div>
-
-        <!-- Tercera fila: Engagement y Canal de adquisición -->
-        <div class="chart-row">
           <div class="chart-container large">
             <BusinessChartJSLineAreaRT 
               chartType="bar" 
@@ -98,7 +84,11 @@
               :kpiTarget="45"
             />
           </div>
-          <div class="chart-container large">
+        </div>
+
+        <!-- Cuarta fila: Canales de adquisición -->
+        <div class="chart-row">
+          <div class="chart-container full-width">
             <ApexStackedBar 
               title="Canales de Adquisición de Clientes"
               :data="canalAdquisicionData"
@@ -124,7 +114,7 @@ import { ref } from 'vue';
 const userConversionRate = ref(8.7);
 const averageRevenuePerUser = ref(24.5);
 const customerRetentionRate = ref(78.3);
-const userSatisfaction = ref(4.2);
+const userSatisfaction = ref(4.5);
 const marketSharePercentage = ref(12.5);
 
 const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
@@ -138,33 +128,34 @@ const suscripcionesData = ref([1000, 1200, 900, 1600, 1900, 1700, 1230, 1500, 80
 
 // Datos de países (KPI: Distribución geográfica)
 const paisesData = ref([
-  { name: 'España', value: 753, itemStyle: { color: '#ff4d4d' } },
-  { name: 'México', value: 954 },
-  { name: 'Estados Unidos', value: 500 },
-  { name: 'Brasil', value: 400 },
-  { name: 'Francia', value: 600 },
-  { name: 'Italia', value: 680 },
-  { name: 'Arabia Saudita', value: 300 },
-  { name: 'Otros', value: 1200 }
+  { name: 'México', value: 954, itemStyle: { color: '#ff4d4d' } },
+  { name: 'Arabia Saudita', value: 900, itemStyle: { color: '#4dff4d' } },
+  { name: 'España', value: 753, itemStyle: { color: '#4d4dff' } },
+  { name: 'Italia', value: 680, itemStyle: { color: '#ffff4d' } },
+  { name: 'Francia', value: 600, itemStyle: { color: '#ff4dff' } },
+  { name: 'Estados Unidos', value: 500, itemStyle: { color: '#4dffff' } },
+  { name: 'Canadá', value: 500, itemStyle: { color: '#ff804d' } },
+  { name: 'Australia', value: 400, itemStyle: { color: '#804dff' } },
+  { name: 'Brazil', value: 400, itemStyle: { color: '#ff4d80' } },
+  { name: 'Otros', value: 1000, itemStyle: { color: '#808080' } }
 ]);
 
 // Datos de tiempo de uso (KPI: Engagement)
-const tiempoUsoData = ref([25, 28, 30, 32, 35, 40, 42, 45, 47, 48, 50, 52]);
+const tiempoUsoData = ref([250, 200, 240, 320, 350, 400, 200, 369, 123, 346, 790, 550]);
 
 // Datos de canales de adquisición (KPI: Eficiencia de marketing)
 const canalAdquisicionData = ref({
-  'Orgánico': [120, 150, 180, 220],
-  'Redes Sociales': [80, 100, 140, 160],
-  'Publicidad Pagada': [50, 70, 90, 110],
-  'Referidos': [30, 40, 50, 70]
+  'Instagram': [800],
+  'TikTok': [600],
+  'Twitter': [400]
 });
 
 // Datos de progreso personalizado
 const progressData = ref([
-  { label: 'Nuevos Usuarios', value: 80, target: 90 },
-  { label: 'Retención', value: 75, target: 85 },
-  { label: 'Ingresos', value: 92, target: 85 },
-  { label: 'Engagement', value: 68, target: 80 }
+  { label: 'Abdomen', value: 200, target: 250 },
+  { label: 'Pectoral', value: 300, target: 350 },
+  { label: 'Espalda', value: 110, target: 150 },
+  { label: 'Pierna', value: 400, target: 450 }
 ]);
 </script>
 
@@ -174,14 +165,15 @@ const progressData = ref([
   flex-direction: column;
   gap: 1rem;
   padding: 1rem;
-  max-width: 1500px;
+  max-width: 1800px;
   margin: 0 auto;
   height: calc(100vh - 56px);
   box-sizing: border-box;
-  overflow: auto;
   margin-top: 56px;
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   position: relative;
+  z-index: 1;
+  overflow: hidden;
 }
 
 .kpi-cards {
@@ -190,36 +182,40 @@ const progressData = ref([
   width: 100%;
   position: relative;
   z-index: 2;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  height: 100px;
 }
 
 .kpi-card {
   flex: 1;
+  min-width: 220px;
   background: rgba(255, 255, 255, 0.95);
   border-radius: 12px;
-  padding: 1rem;
+  padding: 0.75rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 120px;
+  height: 100%;
   text-align: center;
   border-top: 4px solid #ff4d4d;
   position: relative;
 }
 
 .kpi-value {
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: 700;
   color: #16213e;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 .kpi-title {
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: #64748b;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 .kpi-trend {
@@ -243,11 +239,11 @@ const progressData = ref([
   display: flex;
   gap: 1rem;
   width: 100%;
-  min-height: 0;
   flex: 1;
-  height: calc((100vh - 250px - 4rem) / 3);
+  min-height: 0;
   position: relative;
   z-index: 2;
+  flex-wrap: wrap;
 }
 
 .chart-container {
@@ -257,9 +253,7 @@ const progressData = ref([
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
-  min-height: 0;
   overflow: hidden;
-  height: 100%;
   border: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   position: relative;
@@ -268,18 +262,15 @@ const progressData = ref([
 
 .chart-container.large {
   flex: 1;
-  min-width: 0;
+  min-width: calc(50% - 0.5rem);
   width: calc(50% - 0.5rem);
+  height: calc((100vh - 56px - 100px - 4rem) / 3);
 }
 
 .chart-container.full-width {
   width: 100%;
-}
-
-.chart-container.half-width {
-  flex: 1;
-  min-width: 0;
-  width: calc(50% - 0.5rem);
+  height: calc((100vh - 56px - 100px - 4rem) / 3);
+  margin-bottom: 0;
 }
 
 .dashboard-header {
@@ -299,28 +290,47 @@ const progressData = ref([
   --padding-end: 0;
   --padding-top: 0;
   --padding-bottom: 0;
-  overflow: auto;
+  overflow: hidden;
   --background: transparent;
+  position: relative;
+  z-index: 1;
 }
 
 @media (max-width: 768px) {
+  .dashboard-container {
+    padding: 0.75rem;
+    gap: 0.75rem;
+  }
+  
   .kpi-cards {
-    flex-wrap: wrap;
+    gap: 0.75rem;
+    height: 90px;
   }
   
   .kpi-card {
-    flex: 1 1 calc(50% - 1rem);
-    min-width: calc(50% - 1rem);
+    flex: 1 1 calc(50% - 0.75rem);
+    min-width: calc(50% - 0.75rem);
+    padding: 0.5rem;
   }
   
   .chart-row {
     flex-direction: column;
-    height: auto;
+    min-height: 0;
+    gap: 0.75rem;
+  }
+  
+  .chart-container {
+    padding: 0.75rem;
   }
   
   .chart-container.large {
     width: 100%;
-    height: 300px;
+    min-width: 100%;
+    height: calc((100vh - 56px - 90px - 3rem) / 3);
+  }
+
+  .chart-container.full-width {
+    height: calc((100vh - 56px - 90px - 3rem) / 3);
   }
 }
 </style> 

@@ -11,6 +11,14 @@ const props = defineProps({
     type: String,
     required: true
   },
+  data: {
+    type: Array as () => number[],
+    required: true
+  },
+  labels: {
+    type: Array as () => string[],
+    required: true
+  },
   color: {
     type: String,
     default: '#3b82f6'
@@ -23,14 +31,6 @@ const props = defineProps({
     type: Number,
     default: 100
   },
-  data: {
-    type: Array,
-    required: true
-  },
-  labels: {
-    type: Array,
-    required: true
-  },
   kpiTarget: {
     type: Number,
     default: null
@@ -39,109 +39,203 @@ const props = defineProps({
 
 const chartRef = ref<HTMLElement | null>(null);
 let chart: ApexCharts | null = null;
-let updateInterval: number | null = null;
 
-function updateData() {
-  if (!chart) return;
-  
-  const newData = [...props.data];
-  newData.shift();
-  newData.push(Math.floor(Math.random() * (props.max - props.min) + props.min));
-  
-  chart.updateSeries([{
-    data: newData
-  }]);
-}
+function updateChart() {
 
-function initChart() {
   if (!chartRef.value) return;
+
+  if (chart) {
+    chart.destroy();
+  }
 
   const options = {
     chart: {
       type: 'line',
       height: '100%',
+      parentHeightOffset: 0,
+      toolbar: {
+        show: false
+      },
       animations: {
         enabled: true,
-        easing: 'linear',
-        dynamicAnimation: {
-          speed: 1000
-        }
+        easing: 'easeinout',
+        speed: 800
+      },
+      zoom: {
+        enabled: false
       }
     },
     series: [{
       name: props.title,
       data: props.data
     }],
-    xaxis: {
-      categories: props.labels
-    },
-    yaxis: {
-      min: props.min,
-      max: props.max
-    },
     colors: [props.color],
     stroke: {
+      curve: 'smooth',
       width: 3,
-      curve: 'smooth'
+      lineCap: 'round'
     },
     fill: {
       type: 'gradient',
       gradient: {
-        shadeIntensity: 1,
-        opacityFrom: 0.7,
-        opacityTo: 0.3
+        shade: 'light',
+        type: 'vertical',
+        shadeIntensity: 0.25,
+        gradientToColors: undefined,
+        inverseColors: true,
+        opacityFrom: 0.85,
+        opacityTo: 0.85,
+        stops: [0, 100]
       }
-    }
-  };
-
-  if (props.kpiTarget) {
-    options.annotations = {
+    },
+    markers: {
+      size: 4,
+      colors: [props.color],
+      strokeColors: '#fff',
+      strokeWidth: 2,
+      hover: {
+        size: 6
+      }
+    },
+    xaxis: {
+      categories: props.labels,
+      labels: {
+        style: {
+          fontSize: '12px'
+        },
+        rotate: -45,
+        rotateAlways: false
+      },
+      axisBorder: {
+        show: true
+      },
+      axisTicks: {
+        show: true
+      },
+      tooltip: {
+        enabled: false
+      }
+    },
+    yaxis: {
+      title: {
+        text: 'Ingresos (€)',
+        style: {
+          fontSize: '14px'
+        }
+      },
+      labels: {
+        formatter: function (val: number) {
+          return val.toLocaleString() + '€';
+        },
+        show: true,
+        showDuplicates: false,
+        hideOverlappingLabels: true,
+        style: {
+          fontSize: '12px'
+        }
+      },
+      min: 0,
+      max: 2000,
+      tickAmount: 3,
+      forceNiceScale: false,
+      axisTicks: {
+        show: true
+      }
+    },
+    grid: {
+      padding: {
+        top: 20,
+        right: 20,
+        bottom: 20,
+        left: 20
+      },
+      xaxis: {
+        lines: {
+          show: true
+        }
+      },
+      yaxis: {
+        lines: {
+          show: true
+        }
+      }
+    },
+    tooltip: {
+      shared: true,
+      intersect: false,
+      y: {
+        formatter: function (val: number) {
+          if (val >= 1000000) {
+            return (val / 1000000).toFixed(1) + 'M€';
+          } else if (val >= 1000) {
+            return (val / 1000).toFixed(1) + 'K€';
+          }
+          return val.toLocaleString() + '€';
+        }
+      }
+    },
+    legend: {
+      show: false
+    },
+    annotations: {
       yaxis: [{
         y: props.kpiTarget,
-        borderColor: '#00E396',
+        borderColor: '#10b981',
         label: {
-          borderColor: '#00E396',
+          text: 'Objetivo',
           style: {
             color: '#fff',
-            background: '#00E396'
-          },
-          text: 'KPI Target'
+            background: '#10b981'
+          }
         }
       }]
-    };
-  }
+    },
+    responsive: [{
+      breakpoint: 480,
+      options: {
+        chart: {
+          height: 300
+        },
+        xaxis: {
+          labels: {
+            rotate: -45,
+            rotateAlways: true,
+            style: {
+              fontSize: '10px'
+            }
+          }
+        },
+        yaxis: {
+          labels: {
+            style: {
+              fontSize: '10px'
+            }
+          }
+        },
+        markers: {
+          size: 3
+        }
+      }
+    }]
+  };
 
   chart = new ApexCharts(chartRef.value, options);
   chart.render();
 }
 
-onMounted(() => {
-  initChart();
-  updateInterval = window.setInterval(updateData, 3000);
-});
+watch(() => props.data, updateChart, { deep: true });
 
+onMounted(updateChart);
 onUnmounted(() => {
   if (chart) {
     chart.destroy();
   }
-  if (updateInterval) {
-    clearInterval(updateInterval);
-  }
 });
-
-watch(() => props.data, () => {
-  if (chart) {
-    chart.updateSeries([{
-      data: props.data
-    }]);
-  }
-}, { deep: true });
 </script>
 
 <style scoped>
 .chart-container {
   width: 100%;
   height: 100%;
-  min-height: 300px;
 }
 </style> 

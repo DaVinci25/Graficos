@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, defineProps } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import * as echarts from 'echarts';
 
 const props = defineProps({
@@ -26,6 +26,7 @@ const props = defineProps({
 const chartRef = ref<HTMLElement | null>(null);
 let chart: echarts.ECharts | null = null;
 let timer: number | null = null;
+let resizeObserver: ResizeObserver | null = null;
 
 // Datasets
 const cpuData = ref<number[]>([]);
@@ -39,22 +40,22 @@ const initData = () => {
   for (let i = props.maxDataPoints; i > 0; i--) {
     const time = new Date(now.getTime() - i * 1000);
     timePoints.value.push(time.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
-    cpuData.value.push(0);
-    ramData.value.push(0);
-    requestsData.value.push(0);
+    cpuData.value.push(Math.floor(Math.random() * 20) + 60); // 60-80%
+    ramData.value.push(Math.floor(Math.random() * 20) + 65); // 65-85%
+    requestsData.value.push(Math.floor(Math.random() * 30) + 20); // 20-50
   }
 };
 
 // Simulación de datos de servidor
 const generateRandomData = () => {
-  // Valores aleatorios para CPU (45-85%)
-  const newCpuValue = Math.floor(Math.random() * 40) + 45;
+  // Valores aleatorios para CPU (60-80%)
+  const newCpuValue = Math.floor(Math.random() * 20) + 60;
   
-  // Valores aleatorios para RAM (50-90%)
-  const newRamValue = Math.floor(Math.random() * 40) + 50;
+  // Valores aleatorios para RAM (65-85%)
+  const newRamValue = Math.floor(Math.random() * 20) + 65;
   
-  // Valores aleatorios para peticiones por segundo (10-50)
-  const newRequestsValue = Math.floor(Math.random() * 40) + 10;
+  // Valores aleatorios para peticiones por segundo (20-50)
+  const newRequestsValue = Math.floor(Math.random() * 30) + 20;
   
   // Añadir datos nuevos y eliminar el primero
   const now = new Date();
@@ -108,139 +109,165 @@ const updateChart = () => {
 const initChart = () => {
   if (!chartRef.value) return;
   
-  chart = echarts.init(chartRef.value);
-  
-  const option = {
-    title: {
-      show: false
-    },
-    tooltip: {
-      trigger: 'axis',
-      axisPointer: {
-        type: 'cross',
-        label: {
-          backgroundColor: '#6a7985'
+  // Esperar a que el contenedor tenga dimensiones
+  const checkSize = () => {
+    if (chartRef.value && chartRef.value.clientWidth > 0 && chartRef.value.clientHeight > 0) {
+      if (chart) {
+        chart.dispose();
+      }
+      
+      chart = echarts.init(chartRef.value);
+      
+      const option = {
+        title: {
+          show: false
+        },
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'cross',
+            label: {
+              backgroundColor: '#6a7985'
+            }
+          }
+        },
+        legend: {
+          data: ['CPU', 'RAM', 'Peticiones/s'],
+          top: 10,
+          textStyle: {
+            color: '#333'
+          }
+        },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          top: '15%',
+          containLabel: true
+        },
+        xAxis: {
+          type: 'category',
+          boundaryGap: false,
+          data: timePoints.value,
+          axisLabel: {
+            rotate: 45
+          }
+        },
+        yAxis: {
+          type: 'value',
+          max: 100,
+          splitLine: {
+            lineStyle: {
+              color: '#eee'
+            }
+          }
+        },
+        series: [
+          {
+            name: 'CPU',
+            type: 'line',
+            stack: 'Total',
+            areaStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                {
+                  offset: 0,
+                  color: 'rgba(59, 130, 246, 0.8)'
+                },
+                {
+                  offset: 1,
+                  color: 'rgba(59, 130, 246, 0.1)'
+                }
+              ])
+            },
+            emphasis: {
+              focus: 'series'
+            },
+            symbol: 'none',
+            smooth: true,
+            lineStyle: {
+              width: 2,
+              color: '#3b82f6'
+            },
+            data: cpuData.value
+          },
+          {
+            name: 'RAM',
+            type: 'line',
+            stack: 'Total',
+            areaStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                {
+                  offset: 0,
+                  color: 'rgba(16, 185, 129, 0.8)'
+                },
+                {
+                  offset: 1,
+                  color: 'rgba(16, 185, 129, 0.1)'
+                }
+              ])
+            },
+            emphasis: {
+              focus: 'series'
+            },
+            symbol: 'none',
+            smooth: true,
+            lineStyle: {
+              width: 2,
+              color: '#10b981'
+            },
+            data: ramData.value
+          },
+          {
+            name: 'Peticiones/s',
+            type: 'line',
+            stack: 'Total',
+            areaStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                {
+                  offset: 0,
+                  color: 'rgba(245, 158, 11, 0.8)'
+                },
+                {
+                  offset: 1,
+                  color: 'rgba(245, 158, 11, 0.1)'
+                }
+              ])
+            },
+            emphasis: {
+              focus: 'series'
+            },
+            symbol: 'none',
+            smooth: true,
+            lineStyle: {
+              width: 2,
+              color: '#f59e0b'
+            },
+            data: requestsData.value,
+            yAxisIndex: 0
+          }
+        ]
+      };
+      
+      chart.setOption(option);
+      
+      // Configurar el observer para redimensionamiento
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
+      
+      resizeObserver = new ResizeObserver(() => {
+        if (chart) {
+          chart.resize();
         }
-      }
-    },
-    legend: {
-      data: ['CPU', 'RAM', 'Peticiones/s'],
-      top: 10,
-      textStyle: {
-        color: '#333'
-      }
-    },
-    grid: {
-      left: '3%',
-      right: '4%',
-      bottom: '3%',
-      top: '15%',
-      containLabel: true
-    },
-    xAxis: {
-      type: 'category',
-      boundaryGap: false,
-      data: timePoints.value,
-      axisLabel: {
-        rotate: 45
-      }
-    },
-    yAxis: {
-      type: 'value',
-      max: 100,
-      splitLine: {
-        lineStyle: {
-          color: '#eee'
-        }
-      }
-    },
-    series: [
-      {
-        name: 'CPU',
-        type: 'line',
-        stack: 'Total',
-        areaStyle: {
-          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            {
-              offset: 0,
-              color: 'rgba(59, 130, 246, 0.8)'
-            },
-            {
-              offset: 1,
-              color: 'rgba(59, 130, 246, 0.1)'
-            }
-          ])
-        },
-        emphasis: {
-          focus: 'series'
-        },
-        symbol: 'none',
-        smooth: true,
-        lineStyle: {
-          width: 2,
-          color: '#3b82f6'
-        },
-        data: cpuData.value
-      },
-      {
-        name: 'RAM',
-        type: 'line',
-        stack: 'Total',
-        areaStyle: {
-          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            {
-              offset: 0,
-              color: 'rgba(16, 185, 129, 0.8)'
-            },
-            {
-              offset: 1,
-              color: 'rgba(16, 185, 129, 0.1)'
-            }
-          ])
-        },
-        emphasis: {
-          focus: 'series'
-        },
-        symbol: 'none',
-        smooth: true,
-        lineStyle: {
-          width: 2,
-          color: '#10b981'
-        },
-        data: ramData.value
-      },
-      {
-        name: 'Peticiones/s',
-        type: 'line',
-        stack: 'Total',
-        areaStyle: {
-          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            {
-              offset: 0,
-              color: 'rgba(245, 158, 11, 0.8)'
-            },
-            {
-              offset: 1,
-              color: 'rgba(245, 158, 11, 0.1)'
-            }
-          ])
-        },
-        emphasis: {
-          focus: 'series'
-        },
-        symbol: 'none',
-        smooth: true,
-        lineStyle: {
-          width: 2,
-          color: '#f59e0b'
-        },
-        data: requestsData.value,
-        yAxisIndex: 0
-      }
-    ]
+      });
+      
+      resizeObserver.observe(chartRef.value);
+    } else {
+      requestAnimationFrame(checkSize);
+    }
   };
   
-  chart.setOption(option);
+  checkSize();
 };
 
 onMounted(() => {
@@ -251,21 +278,19 @@ onMounted(() => {
   timer = window.setInterval(() => {
     updateChart();
   }, 1000);
-  
-  // Resize handler
-  window.addEventListener('resize', () => {
-    chart && chart.resize();
-  });
 });
 
 onUnmounted(() => {
   if (timer) {
     clearInterval(timer);
   }
-  chart && chart.dispose();
-  window.removeEventListener('resize', () => {
-    chart && chart.resize();
-  });
+  if (resizeObserver) {
+    resizeObserver.disconnect();
+  }
+  if (chart) {
+    chart.dispose();
+    chart = null;
+  }
 });
 </script>
 

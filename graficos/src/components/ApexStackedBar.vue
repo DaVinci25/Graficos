@@ -42,17 +42,36 @@ function updateChart() {
       stacked: true,
       toolbar: {
         show: false
+      },
+      height: '100%',
+      parentHeightOffset: 0,
+      animations: {
+        enabled: true,
+        easing: 'easeinout',
+        speed: 800
       }
     },
     plotOptions: {
       bar: {
         horizontal: false,
         columnWidth: '55%',
-        endingShape: 'rounded'
+        endingShape: 'rounded',
+        distributed: false,
+        dataLabels: {
+          position: 'top'
+        }
       }
     },
     dataLabels: {
-      enabled: false
+      enabled: true,
+      formatter: function (val: number) {
+        return val.toLocaleString();
+      },
+      style: {
+        fontSize: '12px',
+        colors: ['#333']
+      },
+      offsetY: -20
     },
     stroke: {
       show: true,
@@ -60,23 +79,107 @@ function updateChart() {
       colors: ['transparent']
     },
     xaxis: {
-      categories: props.categories
+      categories: props.categories,
+      labels: {
+        style: {
+          fontSize: '12px'
+        }
+      },
+      axisBorder: {
+        show: true
+      },
+      axisTicks: {
+        show: true
+      }
     },
     yaxis: {
       title: {
-        text: 'Interacciones'
-      }
+        text: 'Audiencia',
+        style: {
+          fontSize: '14px'
+        }
+      },
+      labels: {
+        formatter: function (val: number) {
+          return val.toLocaleString();
+        }
+      },
+      min: 0,
+      forceNiceScale: true
     },
     fill: {
-      opacity: 1
+      opacity: 1,
+      type: 'gradient',
+      gradient: {
+        shade: 'light',
+        type: 'vertical',
+        shadeIntensity: 0.25,
+        gradientToColors: undefined,
+        inverseColors: true,
+        opacityFrom: 0.85,
+        opacityTo: 0.85,
+        stops: [0, 100]
+      }
     },
     legend: {
-      position: 'bottom'
+      position: 'bottom',
+      horizontalAlign: 'center',
+      offsetY: 0,
+      itemMargin: {
+        horizontal: 10
+      },
+      onItemClick: {
+        toggleDataSeries: true
+      }
     },
     title: {
       text: props.title,
-      align: 'center'
-    }
+      align: 'center',
+      style: {
+        fontSize: '16px',
+        fontWeight: 'bold'
+      },
+      offsetY: 10
+    },
+    grid: {
+      padding: {
+        top: 20,
+        right: 20,
+        bottom: 20,
+        left: 20
+      },
+      xaxis: {
+        lines: {
+          show: true
+        }
+      },
+      yaxis: {
+        lines: {
+          show: true
+        }
+      }
+    },
+    tooltip: {
+      y: {
+        formatter: function (val: number) {
+          return val.toLocaleString() + ' usuarios';
+        }
+      },
+      shared: true,
+      intersect: false
+    },
+    responsive: [{
+      breakpoint: 480,
+      options: {
+        legend: {
+          position: 'bottom',
+          offsetY: 0
+        },
+        dataLabels: {
+          enabled: false
+        }
+      }
+    }]
   };
 
   chart = new ApexCharts(chartRef.value, {

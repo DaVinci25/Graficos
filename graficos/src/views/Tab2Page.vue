@@ -8,75 +8,94 @@
 
     <ion-content :fullscreen="true" class="dashboard-content">
       <div class="dashboard-container">
-        <!-- KPI Cards -->
+        <!-- Primera fila: KPIs Técnicos -->
         <div class="kpi-cards">
           <div class="kpi-card">
             <div class="kpi-value">{{ cpuUsage }}%</div>
             <div class="kpi-title">Uso de CPU</div>
-            <div class="kpi-trend down">-5%</div>
+            <div class="kpi-trend" :class="cpuTrend >= 0 ? 'up' : 'down'">
+              {{ cpuTrend >= 0 ? '+' : '' }}{{ cpuTrend }}%
+            </div>
           </div>
           <div class="kpi-card">
             <div class="kpi-value">{{ responseTime }}ms</div>
             <div class="kpi-title">Tiempo de Respuesta</div>
-            <div class="kpi-trend up">-7%</div>
+            <div class="kpi-trend" :class="responseTimeTrend >= 0 ? 'down' : 'up'">
+              {{ responseTimeTrend >= 0 ? '+' : '' }}{{ responseTimeTrend }}%
+            </div>
           </div>
           <div class="kpi-card">
             <div class="kpi-value">{{ errorRate }}%</div>
-            <div class="kpi-title">Tasa de Fallos</div>
-            <div class="kpi-trend up">-5%</div>
+            <div class="kpi-title">Tasa de Errores</div>
+            <div class="kpi-trend" :class="errorRateTrend >= 0 ? 'down' : 'up'">
+              {{ errorRateTrend >= 0 ? '+' : '' }}{{ errorRateTrend }}%
+            </div>
           </div>
           <div class="kpi-card">
-            <div class="kpi-value">{{ availability }}%</div>
+            <div class="kpi-value">{{ uptime }}%</div>
             <div class="kpi-title">Disponibilidad</div>
             <div class="kpi-trend up">+0.02%</div>
           </div>
           <div class="kpi-card">
             <div class="kpi-value">{{ appSize }}MB</div>
-            <div class="kpi-title">Tamaño de la App</div>
-            <div class="kpi-trend up">-3%</div>
+            <div class="kpi-title">Tamaño de App</div>
+            <div class="kpi-trend down">-3%</div>
           </div>
         </div>
 
-        <!-- Primera fila: Métricas en tiempo real -->
+        <!-- Segunda fila: Métricas de Rendimiento -->
         <div class="chart-row">
-          <div class="chart-container full-width">
+          <div class="chart-container large">
             <LiveServerMetrics 
               title="Métricas del Servidor en Tiempo Real"
               :maxDataPoints="60"
             />
           </div>
-        </div>
-
-        <!-- Segunda fila: CPU y Memoria -->
-        <div class="chart-row">
           <div class="chart-container large">
             <TechnicalChartJSLineAreaRT 
               chartType="line" 
-              title="Uso de CPU en Tiempo Real" 
+              title="Uso de Recursos del Sistema" 
               color="#ef4444"
               :min="0"
               :max="100"
-              :data="cpuData"
-            />
-          </div>
-          <div class="chart-container large">
-            <TechnicalChartJSLineAreaRT 
-              chartType="line" 
-              title="Uso de Memoria en Tiempo Real" 
-              color="#f59e0b"
-              :min="0"
-              :max="100"
-              :data="memoryData"
+              :data="systemResourcesData"
             />
           </div>
         </div>
 
-        <!-- Tercera fila: Distribución de errores -->
+        <!-- Tercera fila: Errores y Latencia -->
+        <div class="chart-row">
+          <div class="chart-container large">
+            <ApexLineRT 
+              title="Latencia de la API (ms)"
+              :min="0"
+              :max="500"
+              :data="apiLatencyData"
+              :labels="timeLabels"
+              color="#3b82f6"
+            />
+          </div>
+          <div class="chart-container large">
+            <TechnicalChartJSLineAreaRT 
+              chartType="bar" 
+              title="Errores por Tipo" 
+              color="#f59e0b"
+              :min="0"
+              :max="100"
+              :data="errorTypesData"
+            />
+          </div>
+        </div>
+
+        <!-- Cuarta fila: Estado del Sistema -->
         <div class="chart-row">
           <div class="chart-container full-width">
-            <EchartsPie 
-              title="Distribución de Errores por Tipo"
-              :data="errorDistributionData"
+            <CustomProgressChart 
+              title="Estado del Sistema"
+              :data="systemStatusData"
+              :maxValue="100"
+              unit="%"
+              baseColor="#3b82f6"
             />
           </div>
         </div>
@@ -87,63 +106,70 @@
 
 <script setup lang="ts">
 import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/vue';
-import TechnicalChartJSLineAreaRT from '@/components/TechnicalChartJSLineAreaRT.vue';
-import LiveServerMetrics from '@/components/LiveServerMetrics.vue';
-import EchartsPie from '@/components/EchartsPie.vue';
-import CustomProgressChart from '@/components/CustomProgressChart.vue';
 import { ref } from 'vue';
+import TechnicalChartJSLineAreaRT from '@/components/TechnicalChartJSLineAreaRT.vue';
+import ApexLineRT from '@/components/ApexLineRT.vue';
+import LiveServerMetrics from '@/components/LiveServerMetrics.vue';
+import CustomProgressChart from '@/components/CustomProgressChart.vue';
 
 // KPI Values
 const cpuUsage = ref(68);
 const responseTime = ref(280);
 const errorRate = ref(1.7);
-const availability = ref(99.95);
+const uptime = ref(99.95);
 const appSize = ref(48.5);
 
-// Datos de CPU (KPI: Uso de CPU)
-const cpuData = ref([68, 70, 72, 75, 78, 80, 82, 85, 88, 90, 92, 95]);
+// Trends
+const cpuTrend = ref(5);
+const responseTimeTrend = ref(-7);
+const errorRateTrend = ref(-5);
 
-// Datos de memoria (KPI: Uso de memoria)
-const memoryData = ref([45, 48, 50, 52, 55, 58, 60, 62, 65, 68, 70, 72]);
-
-// Datos de distribución de errores
-const errorDistributionData = ref([
-  { name: 'Logrado', value: 75, itemStyle: { color: '#10b981' } },
-  { name: 'Fallado', value: 25, itemStyle: { color: '#ef4444' } }
-]);
-
-// Datos de rendimiento
-const performanceData = ref([
-  { label: 'CPU', value: 68, target: 60 },
-  { label: 'Memoria', value: 75, target: 70 },
-  { label: 'Disco', value: 60, target: 65 },
-  { label: 'Red', value: 90, target: 85 }
-]);
-
-// Datos de interacciones con rutinas
-const rutinasData = ref({
-  'Rutina en casa': [30, 50, 70, 20],
-  'Rutina en gimnasio': [50, 50, 20, 60],
-  'Rutina al aire libre': [30, 60, 50, 40]
+// Time labels for charts
+const timeLabels = Array.from({ length: 12 }, (_, i) => {
+  const date = new Date();
+  date.setHours(date.getHours() - (11 - i));
+  return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
 });
+
+// System Resources Data
+const systemResourcesData = ref([
+  65, 68, 72, 70, 75, 68, 72, 70, 65, 68, 72, 70
+]);
+
+// API Latency Data
+const apiLatencyData = ref([
+  280, 290, 275, 285, 270, 265, 280, 290, 275, 285, 270, 265
+]);
+
+// Error Types Data
+const errorTypesData = ref([
+  15, 12, 18, 10, 14, 16, 13, 11, 17, 14, 12, 15
+]);
+
+// System Status Data
+const systemStatusData = ref([
+  { label: 'CPU', value: 68, target: 80 },
+  { label: 'Memoria', value: 75, target: 85 },
+  { label: 'Disco', value: 45, target: 70 },
+  { label: 'Red', value: 92, target: 95 }
+]);
 </script>
 
 <style scoped>
 .dashboard-container {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
   padding: 1rem;
-  padding-bottom: 80px;
-  max-width: 1500px;
+  max-width: 1800px;
   margin: 0 auto;
   height: calc(100vh - 56px);
   box-sizing: border-box;
-  overflow: hidden;
   margin-top: 56px;
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   position: relative;
   z-index: 1;
+  overflow: hidden;
 }
 
 .kpi-cards {
@@ -154,35 +180,76 @@ const rutinasData = ref({
   z-index: 2;
   margin-bottom: 0.5rem;
   flex-shrink: 0;
+  flex-wrap: wrap;
+  height: 100px;
 }
 
 .kpi-card {
   flex: 1;
+  min-width: 220px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  padding: 0.75rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  border-top: 4px solid #3b82f6;
+  position: relative;
+}
+
+.chart-row {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  z-index: 2;
+  flex-wrap: wrap;
+}
+
+.chart-container {
   background: rgba(255, 255, 255, 0.95);
   border-radius: 12px;
   padding: 1rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100px;
-  text-align: center;
-  border-top: 4px solid #3b82f6;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
   position: relative;
+  z-index: 2;
+}
+
+.chart-container.large {
+  flex: 1;
+  min-width: calc(50% - 0.5rem);
+  width: calc(50% - 0.5rem);
+  height: calc((100vh - 56px - 100px - 4rem) / 3);
+}
+
+.chart-container.full-width {
+  width: 100%;
+  height: calc((100vh - 56px - 100px - 4rem) / 3);
+  margin-bottom: 0;
 }
 
 .kpi-value {
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: 700;
   color: #16213e;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 .kpi-title {
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: #64748b;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 .kpi-trend {
@@ -200,43 +267,6 @@ const rutinasData = ref({
 .kpi-trend.down {
   background-color: rgba(239, 68, 68, 0.2);
   color: #ef4444;
-}
-
-.chart-row {
-  display: flex;
-  gap: 1.5rem;
-  width: 100%;
-  flex: 1;
-  min-height: 0;
-  position: relative;
-  z-index: 2;
-}
-
-.chart-container {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 12px;
-  padding: 1.25rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  overflow: hidden;
-  height: 100%;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  position: relative;
-  z-index: 2;
-}
-
-.chart-container.large {
-  flex: 1;
-  min-width: 0;
-  width: calc(50% - 0.75rem);
-}
-
-.chart-container.full-width {
-  width: 100%;
-  height: 300px;
 }
 
 .dashboard-header {
@@ -264,26 +294,39 @@ const rutinasData = ref({
 
 @media (max-width: 768px) {
   .dashboard-container {
-    padding-bottom: 100px; /* Más espacio para el menú en móvil */
+    padding: 0.75rem;
+    gap: 0.75rem;
   }
   
   .kpi-cards {
-    flex-wrap: wrap;
+    gap: 0.75rem;
+    height: 90px;
   }
   
   .kpi-card {
-    flex: 1 1 calc(50% - 1rem);
-    min-width: calc(50% - 1rem);
+    flex: 1 1 calc(50% - 0.75rem);
+    min-width: calc(50% - 0.75rem);
+    padding: 0.5rem;
   }
   
   .chart-row {
     flex-direction: column;
-    height: auto;
+    min-height: 0;
+    gap: 0.75rem;
+  }
+  
+  .chart-container {
+    padding: 0.75rem;
   }
   
   .chart-container.large {
     width: 100%;
-    height: 300px;
+    min-width: 100%;
+    height: calc((100vh - 56px - 90px - 3rem) / 3);
+  }
+
+  .chart-container.full-width {
+    height: calc((100vh - 56px - 90px - 3rem) / 3);
   }
 }
-</style>
+</style> 
