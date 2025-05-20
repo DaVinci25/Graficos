@@ -23,11 +23,6 @@ const routes: Array<RouteRecordRaw> = [
         path: 'technical',
         name: 'Technical',
         component: () => import('../views/TechnicalPage.vue')
-      },
-      {
-        path: 'kpis',
-        name: 'KPIs',
-        component: () => import('../views/KpiDashboardPage.vue')
       }
     ]
   }

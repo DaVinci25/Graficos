@@ -63,7 +63,8 @@ function updateChart() {
       },
       zoom: {
         enabled: false
-      }
+      },
+      background: '#181f2a'
     },
     series: [{
       name: props.title,
@@ -72,45 +73,56 @@ function updateChart() {
     colors: [props.color],
     stroke: {
       curve: 'smooth',
-      width: 3,
-      lineCap: 'round'
+      width: 5,
+      lineCap: 'round',
+      dashArray: 0,
+      dropShadow: {
+        enabled: true,
+        top: 2,
+        left: 0,
+        blur: 6,
+        opacity: 0.4
+      }
     },
     fill: {
       type: 'gradient',
       gradient: {
-        shade: 'light',
+        shade: 'dark',
         type: 'vertical',
-        shadeIntensity: 0.25,
-        gradientToColors: undefined,
-        inverseColors: true,
+        shadeIntensity: 0.4,
+        gradientToColors: [props.color],
+        inverseColors: false,
         opacityFrom: 0.85,
-        opacityTo: 0.85,
+        opacityTo: 0.5,
         stops: [0, 100]
       }
     },
     markers: {
-      size: 4,
-      colors: [props.color],
-      strokeColors: '#fff',
-      strokeWidth: 2,
+      size: 7,
+      colors: ['#fff'],
+      strokeColors: props.color,
+      strokeWidth: 4,
       hover: {
-        size: 6
+        size: 10
       }
     },
     xaxis: {
       categories: props.labels,
       labels: {
         style: {
-          fontSize: '12px'
+          fontSize: '14px',
+          colors: '#e0e6ed'
         },
         rotate: -45,
         rotateAlways: false
       },
       axisBorder: {
-        show: true
+        show: true,
+        color: '#3b82f6'
       },
       axisTicks: {
-        show: true
+        show: true,
+        color: '#3b82f6'
       },
       tooltip: {
         enabled: false
@@ -120,7 +132,8 @@ function updateChart() {
       title: {
         text: 'Ingresos (€)',
         style: {
-          fontSize: '14px'
+          fontSize: '16px',
+          color: '#e0e6ed'
         }
       },
       labels: {
@@ -131,7 +144,8 @@ function updateChart() {
         showDuplicates: false,
         hideOverlappingLabels: true,
         style: {
-          fontSize: '12px'
+          fontSize: '14px',
+          colors: '#e0e6ed'
         }
       },
       min: 0,
@@ -139,7 +153,8 @@ function updateChart() {
       tickAmount: 3,
       forceNiceScale: false,
       axisTicks: {
-        show: true
+        show: true,
+        color: '#3b82f6'
       }
     },
     grid: {
@@ -151,16 +166,28 @@ function updateChart() {
       },
       xaxis: {
         lines: {
-          show: true
+          show: true,
+          color: '#232b3e'
         }
       },
       yaxis: {
         lines: {
-          show: true
+          show: true,
+          color: '#232b3e'
         }
       }
     },
     tooltip: {
+      theme: 'dark',
+      style: {
+        fontSize: '15px',
+        color: '#fff'
+      },
+      fillSeriesColor: false,
+      marker: {
+        show: true
+      },
+      custom: undefined,
       shared: true,
       intersect: false,
       y: {
@@ -182,10 +209,20 @@ function updateChart() {
         y: props.kpiTarget,
         borderColor: '#10b981',
         label: {
-          text: 'Objetivo',
+          text: `🎯 Objetivo: ${props.kpiTarget}`,
           style: {
             color: '#fff',
-            background: '#10b981'
+            background: '#10b981',
+            fontWeight: 'bold',
+            fontSize: '16px',
+            padding: {
+              left: 12,
+              right: 12,
+              top: 6,
+              bottom: 6
+            },
+            borderRadius: 8,
+            shadow: '0 2px 8px rgba(16,185,129,0.3)'
           }
         }
       }]
@@ -201,19 +238,21 @@ function updateChart() {
             rotate: -45,
             rotateAlways: true,
             style: {
-              fontSize: '10px'
+              fontSize: '10px',
+              colors: '#e0e6ed'
             }
           }
         },
         yaxis: {
           labels: {
             style: {
-              fontSize: '10px'
+              fontSize: '10px',
+              colors: '#e0e6ed'
             }
           }
         },
         markers: {
-          size: 3
+          size: 5
         }
       }
     }]

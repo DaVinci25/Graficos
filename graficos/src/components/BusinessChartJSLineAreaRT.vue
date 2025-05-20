@@ -32,6 +32,10 @@ const props = defineProps({
   data: {
     type: Array as () => number[],
     required: true
+  },
+  kpiTarget: {
+    type: Number,
+    default: null
   }
 });
 
@@ -70,6 +74,30 @@ function updateChart() {
           min: props.min,
           max: props.max
         }
+      },
+      plugins: {
+        annotation: props.kpiTarget !== null ? {
+          annotations: {
+            kpiLine: {
+              type: 'line',
+              yMin: props.kpiTarget,
+              yMax: props.kpiTarget,
+              borderColor: '#10b981',
+              borderWidth: 2,
+              borderDash: [6, 6],
+              label: {
+                enabled: true,
+                content: `Objetivo: ${props.kpiTarget}`,
+                position: 'end',
+                backgroundColor: '#10b981',
+                color: '#fff',
+                font: {
+                  weight: 'bold'
+                }
+              }
+            }
+          }
+        } : undefined
       }
     }
   });

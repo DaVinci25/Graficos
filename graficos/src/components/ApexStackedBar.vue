@@ -160,6 +160,15 @@ function updateChart() {
       }
     },
     tooltip: {
+      theme: 'dark',
+      style: {
+        fontSize: '15px',
+        color: '#fff'
+      },
+      fillSeriesColor: false,
+      marker: {
+        show: true
+      },
       y: {
         formatter: function (val: number) {
           return val.toLocaleString() + ' usuarios';

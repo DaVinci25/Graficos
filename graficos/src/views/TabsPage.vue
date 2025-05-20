@@ -12,11 +12,6 @@
           <ion-icon :icon="hardwareChip"></ion-icon>
           <ion-label>Técnico</ion-label>
         </ion-tab-button>
-
-        <ion-tab-button tab="kpis" href="/tabs/kpis">
-          <ion-icon :icon="speedometer"></ion-icon>
-          <ion-label>KPIs</ion-label>
-        </ion-tab-button>
       </ion-tab-bar>
     </ion-tabs>
   </ion-page>
@@ -24,7 +19,7 @@
 
 <script setup lang="ts">
 import { IonPage, IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, IonRouterOutlet } from '@ionic/vue';
-import { trendingUp, hardwareChip, speedometer } from 'ionicons/icons';
+import { trendingUp, hardwareChip } from 'ionicons/icons';
 </script>
 
 <style scoped>

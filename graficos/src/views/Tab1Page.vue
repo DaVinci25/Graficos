@@ -145,9 +145,10 @@ const tiempoUsoData = ref([250, 200, 240, 320, 350, 400, 200, 369, 123, 346, 790
 
 // Datos de canales de adquisición (KPI: Eficiencia de marketing)
 const canalAdquisicionData = ref({
-  'Instagram': [800],
-  'TikTok': [600],
-  'Twitter': [400]
+  'Instagram': [800, 900, 950, 1000],
+  'Twitter':   [400, 500, 600, 700],
+  'TikTok':    [600, 700, 850, 900],
+  'YouTube':   [300, 450, 600, 800]
 });
 
 // Datos de progreso personalizado
@@ -161,12 +162,13 @@ const progressData = ref([
 
 <style scoped>
 .dashboard-container {
+  width: 80%;
+  max-width: 1800px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 1rem;
   padding: 1rem;
-  max-width: 1800px;
-  margin: 0 auto;
   height: calc(100vh - 56px);
   box-sizing: border-box;
   margin-top: 56px;
@@ -261,9 +263,9 @@ const progressData = ref([
 }
 
 .chart-container.large {
-  flex: 1;
-  min-width: calc(50% - 0.5rem);
-  width: calc(50% - 0.5rem);
+  flex: 1 1 350px;
+  min-width: 350px;
+  max-width: 100%;
   height: calc((100vh - 56px - 100px - 4rem) / 3);
 }
 
