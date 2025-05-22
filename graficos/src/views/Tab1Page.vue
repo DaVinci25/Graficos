@@ -70,6 +70,7 @@
             <EchartsPie 
               title="Distribución de Usuarios por País"
               :data="paisesData"
+              :kpiTarget="objetivoTotalUsuarios"
             />
           </div>
           <div class="chart-container large">
@@ -93,6 +94,7 @@
               title="Canales de Adquisición de Clientes"
               :data="canalAdquisicionData"
               :categories="['Q1', 'Q2', 'Q3', 'Q4']"
+              :kpiTarget="3500"
             />
           </div>
         </div>
@@ -121,7 +123,7 @@ const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
                'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
 // Datos de usuarios activos (KPI: Crecimiento de usuarios)
-const usuariosActivosData = ref([500, 600, 700, 800, 900, 1000, 1100, 1900, 1500, 1400, 1500, 1600]);
+const usuariosActivosData = ref([500, 650, 800, 950, 1100, 1250, 1400, 1550, 1700, 1850, 1900, 1950]);
 
 // Datos de suscripciones (KPI: Ingresos por suscripción)
 const suscripcionesData = ref([1000, 1200, 900, 1600, 1900, 1700, 1230, 1500, 800, 900, 1500, 2000]);
@@ -139,6 +141,9 @@ const paisesData = ref([
   { name: 'Brazil', value: 400, itemStyle: { color: '#ff4d80' } },
   { name: 'Otros', value: 1000, itemStyle: { color: '#808080' } }
 ]);
+
+// Objetivo total de usuarios por país
+const objetivoTotalUsuarios = 7000;
 
 // Datos de tiempo de uso (KPI: Engagement)
 const tiempoUsoData = ref([250, 200, 240, 320, 350, 400, 200, 369, 123, 346, 790, 550]);

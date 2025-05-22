@@ -18,6 +18,10 @@ const props = defineProps({
   categories: {
     type: Array as () => string[],
     required: true
+  },
+  kpiTarget: {
+    type: Number,
+    default: null
   }
 });
 
@@ -94,7 +98,7 @@ function updateChart() {
     },
     yaxis: {
       title: {
-        text: 'Audiencia',
+        text: 'Clientes',
         style: {
           fontSize: '14px'
         }
@@ -171,12 +175,35 @@ function updateChart() {
       },
       y: {
         formatter: function (val: number) {
-          return val.toLocaleString() + ' usuarios';
+          return val.toLocaleString() + ' clientes';
         }
       },
       shared: true,
       intersect: false
     },
+    annotations: props.kpiTarget ? {
+      yaxis: [{
+        y: props.kpiTarget,
+        borderColor: '#10b981',
+        label: {
+          text: `🎯 Objetivo: ${props.kpiTarget.toLocaleString()} clientes`,
+          style: {
+            color: '#fff',
+            background: '#10b981',
+            fontWeight: 'bold',
+            fontSize: '14px',
+            padding: {
+              left: 12,
+              right: 12,
+              top: 6,
+              bottom: 6
+            },
+            borderRadius: 8,
+            shadow: '0 2px 8px rgba(16,185,129,0.3)'
+          }
+        }
+      }]
+    } : undefined,
     responsive: [{
       breakpoint: 480,
       options: {

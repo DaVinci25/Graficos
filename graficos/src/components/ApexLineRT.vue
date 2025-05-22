@@ -202,7 +202,38 @@ function updateChart() {
       }
     },
     legend: {
-      show: false
+      show: true,
+      position: 'top',
+      horizontalAlign: 'right',
+      offsetY: -10,
+      markers: {
+        width: 12,
+        height: 12,
+        strokeWidth: 0,
+        strokeColor: '#fff',
+        radius: 12,
+        offsetX: 0,
+        offsetY: 0
+      },
+      itemMargin: {
+        horizontal: 10,
+        vertical: 5
+      },
+      customLegendItems: ['Actual', 'Objetivo'],
+      formatter: function(legendName: string, opts: any) {
+        const currentValue = props.data[props.data.length - 1];
+        if (legendName === 'Actual') {
+          return [`<div class="legend-item">
+            <span class="legend-marker" style="background-color: ${props.color}"></span>
+            <span class="legend-label">Actual: ${currentValue}</span>
+          </div>`];
+        } else {
+          return [`<div class="legend-item">
+            <span class="legend-marker" style="background-color: #10b981"></span>
+            <span class="legend-label">Objetivo: ${props.kpiTarget}</span>
+          </div>`];
+        }
+      }
     },
     annotations: {
       yaxis: [{
@@ -224,6 +255,24 @@ function updateChart() {
             borderRadius: 8,
             shadow: '0 2px 8px rgba(16,185,129,0.3)'
           }
+        }
+      }],
+      points: [{
+        y: props.kpiTarget,
+        x: props.labels[props.labels.length - 1],
+        marker: {
+          size: 8,
+          fillColor: '#10b981',
+          strokeColor: '#fff',
+          radius: 2
+        },
+        label: {
+          borderColor: '#10b981',
+          style: {
+            color: '#fff',
+            background: '#10b981'
+          },
+          text: 'KPI'
         }
       }]
     },
@@ -276,5 +325,23 @@ onUnmounted(() => {
 .chart-container {
   width: 100%;
   height: 100%;
+}
+
+:deep(.legend-item) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #64748b;
+}
+
+:deep(.legend-marker) {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+:deep(.legend-label) {
+  font-weight: 500;
 }
 </style> 

@@ -22,6 +22,10 @@ const props = defineProps({
   data: {
     type: Array as () => PieData[],
     required: true
+  },
+  kpiTarget: {
+    type: Number,
+    default: null
   }
 });
 
@@ -69,13 +73,28 @@ function updateChart() {
     title: {
       text: props.title,
       left: 'center',
-      top: 20,
+      top: 10,
       textStyle: {
         fontSize: 16,
         fontWeight: 'bold',
         color: '#333'
       }
     },
+    graphic: [{
+      type: 'text',
+      left: 'center',
+      top: '75%',
+      style: {
+        text: [
+          `Total: ${props.data.reduce((sum, item) => sum + item.value, 0).toLocaleString()} usuarios`,
+          `Objetivo: ${props.kpiTarget?.toLocaleString() || 'N/A'} usuarios`
+        ].join('\n'),
+        fontSize: 14,
+        fontWeight: 'normal',
+        fill: '#64748b',
+        lineHeight: 24
+      }
+    }],
     tooltip: {
       trigger: 'item',
       formatter: '{a} <br/>{b}: {c} ({d}%)',
@@ -92,7 +111,7 @@ function updateChart() {
     legend: {
       orient: 'vertical',
       right: '5%',
-      top: 'middle',
+      top: 'center',
       textStyle: {
         color: '#666',
         fontSize: 12
@@ -108,8 +127,8 @@ function updateChart() {
       {
         name: props.title,
         type: 'pie',
-        radius: ['40%', '70%'],
-        center: ['40%', '50%'],
+        radius: ['35%', '60%'],
+        center: ['40%', '45%'],
         avoidLabelOverlap: true,
         itemStyle: {
           borderRadius: 10,

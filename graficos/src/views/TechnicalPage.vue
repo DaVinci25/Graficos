@@ -57,6 +57,7 @@
               :min="0"
               :max="100"
               :data="cpuData"
+              :kpiTarget="70"
             />
           </div>
           <div class="chart-container large">
@@ -67,6 +68,7 @@
               :min="0"
               :max="100"
               :data="memoryData"
+              :kpiTarget="65"
             />
           </div>
         </div>

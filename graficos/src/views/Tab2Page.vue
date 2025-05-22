@@ -73,6 +73,7 @@
               :data="apiLatencyData"
               :labels="timeLabels"
               color="#3b82f6"
+              :kpiTarget="250"
             />
           </div>
           <div class="chart-container large">
@@ -83,6 +84,7 @@
               :min="0"
               :max="100"
               :data="errorTypesData"
+              :kpiTarget="10"
             />
           </div>
         </div>
