@@ -54,7 +54,14 @@
         axisTick: { show: false },
         splitLine: { show: false },
         axisLabel: { show: false },
-        detail: { show: false },
+        detail: {
+          show: true,
+          offsetCenter: [0, '0%'],
+          color: segment.color,
+          fontSize: 20,
+          fontWeight: 'bold',
+          formatter: '{value}%'
+        },
         data: [{
           value: segment.value,
           name: segment.name
@@ -67,13 +74,6 @@
           color: segment.color,
           fontSize: 12,
           fontWeight: 'bold'
-        },
-        detail: {
-          offsetCenter: [0, '0%'],
-          color: segment.color,
-          fontSize: 20,
-          fontWeight: 'bold',
-          formatter: '{value}%'
         }
       }))
     }

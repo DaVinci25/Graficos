@@ -36,11 +36,12 @@ import '@ionic/vue/css/palettes/dark.system.css';
 /* Theme variables */
 import './theme/variables.css';
 
-const app = createApp(App)
-  .use(IonicVue)
-  .use(router)
-  .use(VueApexCharts)
-  .component('v-chart', VueECharts);
+const app = createApp(App);
+
+app.use(IonicVue);
+app.use(router);
+app.component('apexchart', VueApexCharts);
+app.component('v-chart', VueECharts);
 
 router.isReady().then(() => {
   app.mount('#app');

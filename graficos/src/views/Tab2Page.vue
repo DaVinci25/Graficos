@@ -59,6 +59,7 @@
               :min="0"
               :max="100"
               :data="systemResourcesData"
+              :kpiTarget="70"
             />
           </div>
         </div>

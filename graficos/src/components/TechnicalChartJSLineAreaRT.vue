@@ -32,6 +32,10 @@ const props = defineProps({
   data: {
     type: Array as () => number[],
     required: true
+  },
+  kpiTarget: {
+    type: Number,
+    required: true
   }
 });
 
@@ -69,6 +73,54 @@ function updateChart() {
           beginAtZero: true,
           min: props.min,
           max: props.max
+        }
+      },
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top' as const,
+          align: 'end' as const,
+          labels: {
+            usePointStyle: true,
+            pointStyle: 'circle',
+            padding: 20,
+            font: {
+              size: 12
+            },
+            generateLabels: function(chart: any) {
+              const currentValue = props.data[props.data.length - 1];
+              return [
+                {
+                  text: `Actual: ${currentValue}`,
+                  fillStyle: props.color,
+                  strokeStyle: props.color,
+                  lineWidth: 2,
+                  hidden: false,
+                  index: 0
+                },
+                {
+                  text: `Objetivo: ${props.kpiTarget}`,
+                  fillStyle: '#10b981',
+                  strokeStyle: '#10b981',
+                  lineWidth: 2,
+                  hidden: false,
+                  index: 1
+                }
+              ];
+            }
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context: any) {
+              const currentValue = context.raw;
+              const targetValue = props.kpiTarget;
+              return [
+                `Actual: ${currentValue}`,
+                `Objetivo: ${targetValue}`
+              ];
+            }
+          }
         }
       }
     }

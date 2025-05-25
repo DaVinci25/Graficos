@@ -32,6 +32,8 @@
                   :showAxis="false"
                   :showLegend="false"
                   height="60px"
+                  :title="kpi.name"
+                  :kpiTarget="kpi.target"
                 />
                 <div v-else class="trend-line" :style="{ 'background-image': generateTrendGradient(kpi.trend) }"></div>
               </div>
@@ -122,6 +124,8 @@
                   :showAxis="false"
                   :showLegend="false"
                   height="60px"
+                  :title="kpi.name"
+                  :kpiTarget="kpi.target"
                 />
                 <div v-else class="trend-line" :style="{ 'background-image': generateTrendGradient(kpi.trend) }"></div>
               </div>
@@ -158,6 +162,7 @@
                 :min="0"
                 :max="100"
                 :data="systemResourcesData"
+                :kpiTarget="70"
               />
             </div>
             <div class="chart-container large">
@@ -168,6 +173,7 @@
                 :data="apiLatencyData"
                 :labels="timeLabels"
                 color="#3b82f6"
+                :kpiTarget="200"
               />
             </div>
           </div>

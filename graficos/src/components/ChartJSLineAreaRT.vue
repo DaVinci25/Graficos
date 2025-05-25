@@ -35,11 +35,12 @@ ChartJS.register(
 );
 
 const props = defineProps<{
-  chartType: 'line' | 'bar';
+  chartType: 'line' | 'bar' | 'area';
   title: string;
   color: string;
   min: number;
   max: number;
+  kpiTarget?: number;
 }>();
 
 const chartData = ref({
@@ -49,7 +50,7 @@ const chartData = ref({
     data: [] as number[],
     borderColor: props.color,
     backgroundColor: props.color + '20',
-    fill: props.chartType === 'area',
+    fill: props.chartType === 'area' || props.chartType === 'line',
     tension: 0.4
   }]
 });

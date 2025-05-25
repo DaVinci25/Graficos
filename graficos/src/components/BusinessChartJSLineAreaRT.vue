@@ -33,9 +33,13 @@ const props = defineProps({
     type: Array as () => number[],
     required: true
   },
+  labels: {
+    type: Array as () => string[],
+    required: true
+  },
   kpiTarget: {
     type: Number,
-    default: null
+    required: true
   }
 });
 
@@ -52,18 +56,40 @@ function updateChart() {
   const ctx = chartRef.value.getContext('2d');
   if (!ctx) return;
 
+  // Crear gradiente para el área bajo la línea
+  const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+  gradient.addColorStop(0, props.color + '40');
+  gradient.addColorStop(1, props.color + '10');
+
   chart = new Chart(ctx, {
     type: props.chartType as any,
     data: {
-      labels: props.data.map((_, i) => i + 1),
-      datasets: [{
-        label: props.title,
-        data: props.data,
-        borderColor: props.color,
-        backgroundColor: props.color + '40',
-        tension: 0.4,
-        fill: true
-      }]
+      labels: props.labels,
+      datasets: [
+        {
+          label: props.title,
+          data: props.data,
+          borderColor: props.color,
+          backgroundColor: gradient,
+          tension: 0.4,
+          fill: true,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          pointBackgroundColor: props.color,
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2
+        },
+        {
+          label: 'Objetivo KPI',
+          data: Array(props.data.length).fill(props.kpiTarget),
+          borderColor: '#10b981',
+          borderWidth: 2,
+          borderDash: [5, 5],
+          fill: false,
+          pointRadius: 0,
+          tension: 0
+        }
+      ]
     },
     options: {
       responsive: true,
@@ -72,32 +98,71 @@ function updateChart() {
         y: {
           beginAtZero: true,
           min: props.min,
-          max: props.max
+          max: props.max,
+          grid: {
+            color: 'rgba(0, 0, 0, 0.1)'
+          }
+        },
+        x: {
+          grid: {
+            display: false
+          }
         }
       },
       plugins: {
-        annotation: props.kpiTarget !== null ? {
-          annotations: {
-            kpiLine: {
-              type: 'line',
-              yMin: props.kpiTarget,
-              yMax: props.kpiTarget,
-              borderColor: '#10b981',
-              borderWidth: 2,
-              borderDash: [6, 6],
-              label: {
-                enabled: true,
-                content: `Objetivo: ${props.kpiTarget}`,
-                position: 'end',
-                backgroundColor: '#10b981',
-                color: '#fff',
-                font: {
-                  weight: 'bold'
+        legend: {
+          display: true,
+          position: 'top' as const,
+          align: 'end' as const,
+          labels: {
+            usePointStyle: true,
+            pointStyle: 'circle',
+            padding: 20,
+            font: {
+              size: 12
+            },
+            generateLabels: function(chart: any) {
+              const currentValue = props.data[props.data.length - 1];
+              return [
+                {
+                  text: `Actual: ${currentValue} usuarios`,
+                  fillStyle: props.color,
+                  strokeStyle: props.color,
+                  lineWidth: 2,
+                  hidden: false,
+                  index: 0
+                },
+                {
+                  text: `Objetivo: ${props.kpiTarget} usuarios`,
+                  fillStyle: '#10b981',
+                  strokeStyle: '#10b981',
+                  lineWidth: 2,
+                  hidden: false,
+                  index: 1
                 }
+              ];
+            }
+          }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          titleColor: '#1e293b',
+          bodyColor: '#64748b',
+          borderColor: '#e2e8f0',
+          borderWidth: 1,
+          padding: 12,
+          callbacks: {
+            label: function(context: any) {
+              const currentValue = context.raw;
+              const targetValue = props.kpiTarget;
+              if (context.datasetIndex === 0) {
+                return `Actual: ${currentValue} usuarios`;
+              } else {
+                return `Objetivo: ${targetValue} usuarios`;
               }
             }
           }
-        } : undefined
+        }
       }
     }
   });
@@ -117,5 +182,6 @@ onUnmounted(() => {
 .chart-container {
   width: 100%;
   height: 100%;
+  position: relative;
 }
 </style> 
